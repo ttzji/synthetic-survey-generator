@@ -1,0 +1,17 @@
+# Raw GSS microdata -- too large for GitHub and should not be redistributed.
+# Obtain directly from NORC: https://gss.norc.org/get-the-data
+*.sav
+raw_gss_data/
+
+# Python environment / cache
+.venv/
+venv*/
+__pycache__/
+*.pyc
+.DS_Store
+
+# Local secrets
+.env
+.streamlit/secrets.toml
+
+.idea/

@@ -243,6 +243,73 @@ def describe_persona(row, value_labels):
         "religion": label_for("relig", row["relig"]),
     }
 
+def build_data_dictionary(value_labels):
+    """
+    Builds a plain-language reference for every column a generated dataset
+    or coverage report can contain. Demographic value labels are pulled
+    directly from value_labels (the same file used at generation time),
+    so this can never drift out of sync with what the codes actually mean.
+    """
+    rows = []
+
+    def add(column, description, values=""):
+        rows.append({"column": column, "description": description, "possible_values": values})
+
+    demo_vars = {
+        "age": "Respondent's age in years (numeric, not coded).",
+        "sex": "Respondent's sex, as coded by GSS.",
+        "race": "Respondent's race, as coded by GSS.",
+        "marital": "Respondent's marital status, as coded by GSS.",
+        "wrkstat": "Respondent's employment status, as coded by GSS.",
+        "relig": "Respondent's religious affiliation, as coded by GSS.",
+        "region": "Respondent's U.S. census region, as coded by GSS.",
+        "educ": "Respondent's years of education (numeric, not coded).",
+    }
+    for var, desc in demo_vars.items():
+        labels = value_labels.get(var, {})
+        if labels:
+            value_str = "; ".join(f"{k} = {v}" for k, v in sorted(labels.items(), key=lambda x: x[0]))
+        else:
+            value_str = "(numeric value, no category labels)"
+        add(var, desc, value_str)
+
+    add("item_N_raw_propensity",
+        "The LLM's raw 0-1 endorsement estimate for item N, before calibration. "
+        "Diagnostic only -- not on the response scale, not meant for analysis.")
+    add("item_N_response",
+        "The final generated response for item N, on the scale you requested "
+        "(e.g. 1-7 for Likert, 0/1 for binary). This is the column to analyze.")
+    add("item_N_source",
+        "How item N's response column was calibrated.",
+        "item_calibrated = matched to a specific real GSS variable (or a blend "
+        "of several); population_calibrated = no sufficiently strong specific "
+        "match was found, so the response was calibrated to the general shape "
+        "of real Likert responses instead, without being tied to particular "
+        "survey content.")
+
+    add("item", "The exact item text you supplied.")
+    add("method",
+        "How the item was matched to real data.",
+        "single_best = one strong real GSS variable match; ensemble = a "
+        "quality-filtered blend of several real variables; none = no real "
+        "anchor found, population-level calibration used instead.")
+    add("matched_variable", "The real GSS variable name(s) used to calibrate this item (if any).")
+    add("similarity_top1", "Semantic similarity (0-1) between your item and its nearest real GSS match.")
+    add("confidence_tier",
+        "Overall confidence in this item's real-data grounding.",
+        "high = single strong match, empirically clears the error bar ~68% of the "
+        "time; moderate = blended match, clears it ~50% of the time; "
+        "none = population-level calibration only, no specific real-data anchor.")
+    add("expected_error",
+        "Historically observed calibration error for matches at this "
+        "similarity level, from internal validation studies -- a rough "
+        "reference, not a guarantee for this specific item.")
+    add("expected_error_n_cases", "How many historical validation cases that expected_error estimate is based on.")
+    add("real_n_min", "Smallest real-respondent sample size among the GSS variable(s) used to calibrate this item.")
+    add("years_fielded_min", "Fewest years any calibrating GSS variable was fielded (more years = more stable estimate).")
+
+    return pd.DataFrame(rows)
+
 # =========================================================================
 # PART 2: Item retrieval + real-data calibration
 # =========================================================================

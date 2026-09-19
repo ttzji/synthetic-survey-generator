@@ -123,6 +123,19 @@ examples/               Example end-to-end generation scripts
 
 
 
+## Understanding the output
+
+Every generated dataset ships alongside a **coverage report** (per-item retrieval
+match, confidence tier, expected error) and, in the web interface, a
+**data dictionary** explaining every column -- including the actual value
+labels for demographic codes (e.g. what `sex=1` or `race=2` means),
+generated directly from the same file the pipeline uses internally, so it
+can never drift out of sync with the real data. In the web app, this
+appears as an expandable "What do these columns mean?" panel next to the
+results, plus its own downloadable CSV so it travels with the dataset.
+Programmatically, call `build_data_dictionary(value_labels)` in
+`generate_dataset.py`.
+
 ## Known limitations
 
 - Real-data calibration is only as broad as GSS's own topic coverage;

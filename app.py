@@ -4,26 +4,49 @@ Streamlit front-end for the synthetic survey data generation tool.
 Run locally with:
     streamlit run app.py
 
-Deploy on Streamlit Community Cloud by pushing this file (plus all the
-pipeline's data files: gss_variable_embeddings.npy, gss_variable_index.csv,
-gss_master_variable_stats.json, gss_demographics_pool.csv,
-gss_demographics_value_labels.json, generic_likert_shape.npy,
-hybrid_validation_results.csv or validation_results.csv, and
-generate_dataset.py) to a GitHub repo, then connecting that repo at
-streamlit.io. Set OPENAI_API_KEY under the app's "Secrets" in the Streamlit
-Cloud dashboard -- never hardcode it here.
+Deploy on Streamlit Community Cloud by pushing this repository (including
+the data/ folder -- see README.md for its full contents) to GitHub, then
+connecting it at share.streamlit.io. Set OPENAI_API_KEY (and optionally
+ACCESS_CODE, for link+code sharing without individual viewer emails) under
+the app's "Secrets" in the Streamlit Cloud dashboard -- never hardcode
+either here.
 """
 
 import importlib.util
+import json
 import streamlit as st
-import pandas as pd
 
 # --- Load the existing, validated pipeline ---
 spec = importlib.util.spec_from_file_location("gen", "generate_dataset.py")
 gen = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(gen)
 
+with open("data/gss_demographics_value_labels.json", encoding="utf-8") as f:
+    VALUE_LABELS = json.load(f)
+
 st.set_page_config(page_title="Synthetic Survey Data Generator", layout="wide")
+
+# --- Access code gate ---
+# Share the app link + this code together (e.g. in your paper or with
+# reviewers) rather than needing to know each viewer's email in advance.
+# Set ACCESS_CODE under this app's Secrets in the Streamlit Cloud dashboard.
+if "authenticated" not in st.session_state:
+    st.session_state["authenticated"] = False
+
+if not st.session_state["authenticated"]:
+    st.title("Synthetic Survey Data Generator")
+    entered_code = st.text_input("Enter access code to continue", type="password")
+    if st.button("Submit"):
+        correct_code = st.secrets.get("ACCESS_CODE")
+        if not correct_code:
+            st.error("Access code not configured for this app. Contact the app owner.")
+        elif entered_code == correct_code:
+            st.session_state["authenticated"] = True
+            st.rerun()
+        else:
+            st.error("Incorrect access code.")
+    st.stop()
+
 st.title("Synthetic Survey Data Generator")
 st.caption(
     "Generates a synthetic dataset calibrated against real U.S. General Social "
@@ -55,7 +78,9 @@ st.header("2. Sample")
 
 col1, col2 = st.columns(2)
 with col1:
-    n = st.number_input("Sample size (N)", min_value=10, max_value=1000, value=300, step=10)
+    n = st.number_input("Sample size (N)", min_value=10, max_value=1000, value=100, step=10)
+    st.caption("Larger N takes proportionally longer and costs proportionally more "
+               "(a few cents at N=300; well under $1 even at the maximum of 1000).")
 with col2:
     seed = st.number_input("Random seed (for reproducibility)", min_value=0, value=42, step=1)
 
@@ -171,7 +196,11 @@ if "result_df" in st.session_state:
     st.subheader("Generated dataset preview")
     st.dataframe(st.session_state["result_df"].head(20), use_container_width=True)
 
-    col1, col2 = st.columns(2)
+    with st.expander("What do these columns mean?"):
+        data_dict = gen.build_data_dictionary(VALUE_LABELS)
+        st.dataframe(data_dict, use_container_width=True, hide_index=True)
+
+    col1, col2, col3 = st.columns(3)
     with col1:
         st.download_button(
             "Download full dataset (CSV)",
@@ -186,3 +215,13 @@ if "result_df" in st.session_state:
             file_name="coverage_report.csv",
             mime="text/csv",
         )
+    with col3:
+        st.download_button(
+            "Download data dictionary (CSV)",
+            data_dict.to_csv(index=False),
+            file_name="data_dictionary.csv",
+            mime="text/csv",
+        )
+    st.caption("Generated data is held only in this browser session and is not "
+               "stored on any server. Download it before closing this tab if "
+               "you want to keep it.")

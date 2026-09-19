@@ -195,7 +195,7 @@ if "result_df" in st.session_state:
 
     with st.expander("What do these columns mean?"):
         data_dict = gen.build_data_dictionary()
-        st.dataframe(data_dict, use_container_width=True, hide_index=True)
+        st.table(data_dict.set_index("column"))
 
     col1, col2, col3 = st.columns(3)
     with col1:

@@ -227,12 +227,53 @@ def build_sample_pool(mode, n, seed, filters=None, age_min=None, age_max=None,
     else:
         raise ValueError("mode must be 'representative' or 'custom'")
 
-def describe_persona(row, value_labels):
+# Verified directly against GSS's own published codebook documentation
+# (gss.norc.org / sda.berkeley.edu), NOT derived from gss_demographics_value_labels.json --
+# that file was found to return generic missing-value codes (e.g. "-100 = iap")
+# identically for every variable, rather than each variable's real substantive
+# labels. Used for BOTH the actual persona descriptions sent to the LLM
+# (describe_persona) and the user-facing data dictionary (build_data_dictionary),
+# so a single verified source drives both.
+#
+# NOTE: region is entered as the 9-category census DIVISION scheme GSS
+# documents for its REGION variable (New England, Middle Atlantic, etc.),
+# NOT the simpler 4-category census region grouping -- confirm against your
+# specific .sav file's actual REGION coding before relying on this for region.
+# NOTE: region uses the 4-category census region scheme (confirmed by user
+# to match the actual coding in the 1972-2024 Cumulative Datafile's REGION
+# variable), not the 9-category census division scheme some GSS
+# documentation shows for related variables like reg16 (region at age 16).
+DEMOGRAPHIC_CODEBOOK = {
+    "sex": {1: "Male", 2: "Female"},
+    "race": {1: "White", 2: "Black", 3: "Other"},
+    "marital": {1: "Married", 2: "Widowed", 3: "Divorced", 4: "Separated", 5: "Never married"},
+    "wrkstat": {
+        1: "Working full time", 2: "Working part time",
+        3: "With a job, but not at work (temporary illness/vacation/strike)",
+        4: "Unemployed, laid off, looking for work", 5: "Retired",
+        6: "In school", 7: "Keeping house", 8: "Other",
+    },
+    "relig": {
+        1: "Protestant", 2: "Catholic", 3: "Jewish", 4: "None", 5: "Other",
+        6: "Buddhism", 7: "Hinduism", 8: "Other Eastern religions",
+        9: "Muslim/Islam", 10: "Orthodox-Christian", 11: "Christian",
+        12: "Native American", 13: "Inter-nondenominational",
+    },
+    "region": {1: "Northeast", 2: "Midwest", 3: "South", 4: "West"},
+}
+
+
+def describe_persona(row, value_labels=None):
     """Turn a resampled respondent's raw codes into a human-readable
-    description for the LLM prompt, using GSS's own value labels."""
+    description for the LLM prompt, using the verified DEMOGRAPHIC_CODEBOOK
+    above rather than the (unreliable, for this file) extracted value_labels.
+    value_labels is accepted for backward compatibility but no longer used
+    for these fields."""
     def label_for(var, code):
-        labels = value_labels.get(var, {})
-        return labels.get(str(int(code)), str(code)) if pd.notna(code) else "unknown"
+        if pd.isna(code):
+            return "unknown"
+        labels = DEMOGRAPHIC_CODEBOOK.get(var, {})
+        return labels.get(int(code), str(code))
 
     return {
         "age": int(row["age"]),
@@ -243,12 +284,12 @@ def describe_persona(row, value_labels):
         "religion": label_for("relig", row["relig"]),
     }
 
-def build_data_dictionary(value_labels):
+def build_data_dictionary(value_labels=None):
     """
     Builds a plain-language reference for every column a generated dataset
-    or coverage report can contain. Demographic value labels are pulled
-    directly from value_labels (the same file used at generation time),
-    so this can never drift out of sync with what the codes actually mean.
+    or coverage report can contain. Demographic value labels come from the
+    verified DEMOGRAPHIC_CODEBOOK above (value_labels param accepted for
+    backward compatibility but no longer used -- see that comment for why).
     """
     rows = []
 
@@ -266,7 +307,7 @@ def build_data_dictionary(value_labels):
         "educ": "Respondent's years of education (numeric, not coded).",
     }
     for var, desc in demo_vars.items():
-        labels = value_labels.get(var, {})
+        labels = DEMOGRAPHIC_CODEBOOK.get(var, {})
         if labels:
             value_str = "; ".join(f"{k} = {v}" for k, v in sorted(labels.items(), key=lambda x: x[0]))
         else:

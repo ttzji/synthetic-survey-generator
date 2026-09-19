@@ -68,6 +68,16 @@ examples/               Example end-to-end generation scripts
    ```bash
    export OPENAI_API_KEY="your-key-here"
    ```
+   For the web interface (`app.py`), also set an access code so the app
+   can be shared as "link + code" without needing individual viewer
+   emails. Locally, create `.streamlit/secrets.toml` (never commit this
+   file -- already excluded by `.gitignore`):
+   ```toml
+   OPENAI_API_KEY = "your-key-here"
+   ACCESS_CODE = "your-chosen-code"
+   ```
+   On Streamlit Community Cloud, set both under the deployed app's
+   Settings -> Secrets instead.
 
 5. **Run the pipeline scripts in `pipeline/`, in numbered order.** Each
    writes its output into `data/`:
@@ -133,8 +143,14 @@ generated directly from the same file the pipeline uses internally, so it
 can never drift out of sync with the real data. In the web app, this
 appears as an expandable "What do these columns mean?" panel next to the
 results, plus its own downloadable CSV so it travels with the dataset.
-Programmatically, call `build_data_dictionary(value_labels)` in
-`generate_dataset.py`.
+Programmatically, call `build_data_dictionary()` in
+`generate_dataset.py` (no arguments needed -- demographic value labels
+come from a hardcoded, verified `DEMOGRAPHIC_CODEBOOK`, not from
+`gss_demographics_value_labels.json`. That file's raw content is actually
+correct, but GSS attaches ~12 standardized missing-value codes to nearly
+every variable, and code that displayed or looked up labels directly from
+it was tripped up by that noise plus a key-format mismatch. Using a
+verified hardcoded table sidesteps both issues cleanly).
 
 ## Known limitations
 

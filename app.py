@@ -13,16 +13,12 @@ either here.
 """
 
 import importlib.util
-import json
 import streamlit as st
 
 # --- Load the existing, validated pipeline ---
 spec = importlib.util.spec_from_file_location("gen", "generate_dataset.py")
 gen = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(gen)
-
-with open("data/gss_demographics_value_labels.json", encoding="utf-8") as f:
-    VALUE_LABELS = json.load(f)
 
 st.set_page_config(page_title="Synthetic Survey Data Generator", layout="wide")
 
@@ -79,8 +75,7 @@ st.header("2. Sample")
 col1, col2 = st.columns(2)
 with col1:
     n = st.number_input("Sample size (N)", min_value=10, max_value=1000, value=100, step=10)
-    st.caption("Larger N takes proportionally longer and costs proportionally more "
-               "(a few cents at N=300; well under $1 even at the maximum of 1000).")
+    st.caption("Larger N takes proportionally longer to generate.")
 with col2:
     seed = st.number_input("Random seed (for reproducibility)", min_value=0, value=42, step=1)
 
@@ -197,7 +192,7 @@ if "result_df" in st.session_state:
     st.dataframe(st.session_state["result_df"].head(20), use_container_width=True)
 
     with st.expander("What do these columns mean?"):
-        data_dict = gen.build_data_dictionary(VALUE_LABELS)
+        data_dict = gen.build_data_dictionary()
         st.dataframe(data_dict, use_container_width=True, hide_index=True)
 
     col1, col2, col3 = st.columns(3)

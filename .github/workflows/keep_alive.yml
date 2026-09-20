@@ -1,0 +1,18 @@
+name: Keep Streamlit app awake
+
+# Runs every 6 hours (well under Streamlit Community Cloud's 12-hour
+# inactivity sleep threshold), plus lets you trigger it manually from the
+# GitHub Actions tab if you want to wake the app right before a reviewer
+# is expected to look at it.
+on:
+  schedule:
+    - cron: "0 */6 * * *"
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping the app to keep it awake
+        run: |
+          curl -s -o /dev/null -w "HTTP status: %{http_code}\n" "${{ secrets.APP_URL }}" || true

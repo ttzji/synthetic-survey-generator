@@ -32,7 +32,7 @@ if "authenticated" not in st.session_state:
 if not st.session_state["authenticated"]:
     st.title("Synthetic Survey Data Generator")
     with st.form("access_code_form"):
-        entered_code = st.text_input("Enter access code to continue", type="password")
+        entered_code = st.text_input("Enter access code to continue (case sensitive)", type="password")
         submitted = st.form_submit_button("Submit")
     if submitted:
         correct_code = st.secrets.get("ACCESS_CODE")

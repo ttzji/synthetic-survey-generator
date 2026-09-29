@@ -130,6 +130,9 @@ examples/               Example end-to-end generation scripts
 - `propensity_std_validation_results.csv`
 - `batch_size_reliability_results.csv`
 - `batch_size_reliability_followup_results.csv`
+- `naive_baseline_comparison_results_N100.csv`, `_N300.csv`, `_N500.csv`, `_N1000.csv` (one file per script
+  `validation/10_validate_vs_naive_baseline_<N>.py`, at that number of synthetic respondents)
+- `item_correlation_comparison.csv` (input to `validation/13_validate_item_correlation_inflation.py`)
 
 
 

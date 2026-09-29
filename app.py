@@ -70,7 +70,7 @@ binary_text = st.text_area(
     placeholder="I am currently a member of a labor union",
 )
 
-likert_scale = st.radio("Likert response scale", [5, 7], horizontal=True, index=1)
+likert_scale = st.radio("Likert response scale", [4, 5, 7, 9], horizontal=True, index=2)
 
 st.header("2. Sample")
 
@@ -196,6 +196,13 @@ if "result_df" in st.session_state:
     with st.expander("What do these columns mean?"):
         data_dict = gen.build_data_dictionary()
         st.table(data_dict.set_index("column"))
+
+    st.info(
+        "**Note on correlations:** generated correlations between items run about "
+        "10% higher than real data on average (tested on 1,788 real item pairs). "
+        "For a rough adjustment, divide computed correlations by ~1.1. "
+        "Details: validation/13 in the GitHub repo."
+    )
 
     col1, col2, col3 = st.columns(3)
     with col1:

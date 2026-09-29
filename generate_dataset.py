@@ -26,9 +26,20 @@ Required input files (produced by the pipeline/ scripts):
 
 import csv
 import json
+import os
 import numpy as np
 import pandas as pd
 from openai import OpenAI
+
+# Resolve the data/ folder relative to THIS FILE's location, not whatever
+# directory the process happens to be run from -- makes this module work
+# correctly regardless of where a calling script lives (repo root,
+# examples/, validation/, etc.) or what working directory it was launched from.
+_SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+_DATA_DIR = os.path.join(_SCRIPT_DIR, "data")
+
+def _data_path(filename):
+    return os.path.join(_DATA_DIR, filename)
 
 EMBED_MODEL = "text-embedding-3-small"
 GEN_MODEL = "gpt-4.1-mini"
@@ -47,7 +58,7 @@ MIN_ANCHOR_SPECIFIC_CASES = 5  # if THIS SPECIFIC matched variable was used
                                  # historical error rather than the broader
                                  # similarity-bin average
 
-def build_error_lookup_table(validation_csv="data/hybrid_validation_results.csv"):
+def build_error_lookup_table(validation_csv=_data_path("hybrid_validation_results.csv")):
     """
     Empirical expected-error lookup, binned by similarity, built from the
     hybrid validation study (validation/05_validate_hybrid_coverage.py) so
@@ -68,7 +79,7 @@ def build_error_lookup_table(validation_csv="data/hybrid_validation_results.csv"
             print(f"  (error lookup: excluded {before - len(df)} 'none'-method rows)")
     except FileNotFoundError:
         try:
-            df = pd.read_csv("data/validation_results.csv")
+            df = pd.read_csv(_data_path("validation_results.csv"))
             sim_col = "similarity"
             error_col = "cdf_distance_error"
         except FileNotFoundError:
@@ -108,12 +119,12 @@ def load_demographics_pool():
     """Load the real-respondent demographic pool, keeping only complete
     cases across the fields describe_persona() needs (real item-level
     non-response otherwise leaves NaNs that break persona construction)."""
-    df = pd.read_csv("data/gss_demographics_pool.csv")
+    df = pd.read_csv(_data_path("gss_demographics_pool.csv"))
     before = len(df)
     df = df.dropna(subset=CORE_DEMO_FIELDS)
     if before - len(df) > 0:
         print(f"  (demographics pool: dropped {before - len(df)} incomplete respondents)")
-    with open("data/gss_demographics_value_labels.json", encoding="utf-8") as f:
+    with open(_data_path("gss_demographics_value_labels.json"), encoding="utf-8") as f:
         value_labels = json.load(f)
     return df, value_labels
 
@@ -356,13 +367,13 @@ def build_data_dictionary(value_labels=None):
 # =========================================================================
 
 def load_item_resources():
-    embeddings = np.load("data/gss_variable_embeddings.npy")
+    embeddings = np.load(_data_path("gss_variable_embeddings.npy"))
     variables, labels = [], []
-    with open("data/gss_variable_index.csv", newline="", encoding="utf-8") as f:
+    with open(_data_path("gss_variable_index.csv"), newline="", encoding="utf-8") as f:
         for row in csv.DictReader(f):
             variables.append(row["variable"])
             labels.append(row["label"])
-    with open("data/gss_master_variable_stats.json", encoding="utf-8") as f:
+    with open(_data_path("gss_master_variable_stats.json"), encoding="utf-8") as f:
         stats = json.load(f)
     return embeddings, variables, labels, stats
 
@@ -591,7 +602,7 @@ def load_generic_shape():
     pipeline/06_build_generic_shape.py from thousands of real GSS items.
     Falls back to a flat/uniform curve if the file isn't present."""
     try:
-        return np.load("data/generic_likert_shape.npy")
+        return np.load(_data_path("generic_likert_shape.npy"))
     except FileNotFoundError:
         print("  NOTE: generic_likert_shape.npy not found -- falling back to "
               "flat/uniform shape for population-level calibration. Run "
@@ -769,7 +780,10 @@ def generate_dataset(items, n, seed, mode="representative",
     filters: list of names from FILTER_DEFINITIONS, e.g. ["employed", "married"]
     age_min, age_max: age range (custom mode only)
     female_pct, white_pct: target proportions 0-1 (custom mode only, optional)
-    likert_scale: 5 or 7 -- output scale for Likert-type items (ignored for binary items)
+    likert_scale: output scale for Likert-type items, e.g. 4, 5, 7, or 9
+        (ignored for binary items). The underlying calibration works for
+        any integer scale size; 4, 5, 7 and 9 are the values exposed
+        in the web interface.
     batch_size: personas per LLM call. Leave as None to use the empirically
         validated default (8). Overriding this is not recommended -- see
         VALIDATED_BATCH_SIZE comment above.
@@ -885,10 +899,18 @@ def generate_dataset(items, n, seed, mode="representative",
             progress_callback(completed, n)
 
     print(f"\n=== Step 4: Calibrating (percentile-based) ===")
+
+    # --- Extract all raw propensity arrays first (needed before per-item
+    # calibration, so pairs can be reshuffled jointly where a real target
+    # correlation exists) ---
+    raw_by_item = {}
+    for i in range(len(items_info)):
+        col_key = f"item_{i+1}"
+        raw_by_item[i] = np.array([p[col_key] for p in all_propensities])
+
     final_df = demo_df[["age", "sex", "race", "marital", "wrkstat", "relig", "region", "educ"]].copy()
     for i, info in enumerate(items_info):
-        col_key = f"item_{i+1}"
-        raw = np.array([p[col_key] for p in all_propensities])
+        raw = raw_by_item[i]
         final_df[f"item_{i+1}_raw_propensity"] = raw
         raw_std = raw.std()
         response_type = info["response_type"]

@@ -1,18 +1,35 @@
 name: Keep Streamlit app awake
 
-# Runs every 6 hours (well under Streamlit Community Cloud's 12-hour
-# inactivity sleep threshold), plus lets you trigger it manually from the
-# GitHub Actions tab if you want to wake the app right before a reviewer
-# is expected to look at it.
+# Streamlit Community Cloud puts apps to sleep after 12 hours without traffic, and only a real visit counts
+# (commits do not). This opens the app in a headless browser every 4 hours. If the app is asleep it clicks
+# the wake-up button; if the app does not come up, the run FAILS, so you see a red mark and get an email.
+#
+# Runs at minute 17: GitHub's scheduler is best-effort and the top of the hour is its busiest time.
+# Scheduled workflows only run from the DEFAULT branch, so this file must be on main.
+# GitHub switches scheduled workflows off after 60 days with no repository activity; any push re-arms it, and
+# you can always run it by hand from the Actions tab (Run workflow).
 on:
   schedule:
-    - cron: "0 */6 * * *"
+    - cron: "17 */4 * * *"
   workflow_dispatch:
 
 jobs:
-  ping:
+  visit:
     runs-on: ubuntu-latest
+    timeout-minutes: 12
     steps:
-      - name: Ping the app to keep it awake
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install a browser
         run: |
-          curl -s -o /dev/null -w "HTTP status: %{http_code}\n" "${{ secrets.APP_URL }}" || true
+          python -m pip install --quiet playwright
+          python -m playwright install --with-deps chromium
+
+      - name: Visit the app like a real user
+        env:
+          APP_URL: ${{ secrets.APP_URL }}
+        run: python .github/scripts/keep_alive.py

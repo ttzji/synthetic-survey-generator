@@ -1,168 +1,157 @@
 # Synthetic Survey Data Generator
 
-Generates synthetic survey response data for arbitrary researcher-supplied
-scale items, calibrated against real U.S. General Social Survey (GSS)
-response distributions where a sufficiently strong match exists, with
-transparent per-item confidence labeling and empirically-derived error
-estimates.
+Generates synthetic survey responses for researcher-supplied scale items, calibrated against real
+U.S. General Social Survey (GSS) answer distributions where a strong enough match exists, with a
+confidence label and an empirical error rate for every item.
 
-**Scope:** GSS is a U.S.-only survey; all calibration reflects the U.S.
-adult population.
+**Intended use: pretesting** item wording, response formats, analysis scripts and floor/ceiling
+effects. It is not a substitute for human data in inference.
+**Scope:** the GSS is a U.S. survey, so all calibration reflects U.S. adults.
+**License:** [PolyForm Noncommercial 1.0.0](LICENSE). Free for research, teaching and other
+noncommercial use. For commercial use, contact Jack Zhang (jleaf1983@gmail.com).
+
+## What the validation shows
+
+| Finding | Evidence | Where |
+|---|---|---|
+| Calibration beats raw model output on GSS-covered items | Distribution error fell 43.2%, 40.8%, 39.6% and 38.2% in four runs (N = 100 to 1,000 synthetic respondents; all p <= .004) | `validation/10_validate_vs_naive_baseline_*.py`, `data/naive_baseline_comparison_results_N*.csv` |
+| A confident real anchor exists for a third of novel items | 33.2% of the 6,064 held-out GSS variables pass the production gate | `validation/05_validate_hybrid_coverage.py`, `data/hybrid_validation_results.csv` |
+| Generated correlations run too high | About +0.07 between scales and +0.16 within scales, against 398 real working adults. Dividing off-diagonal correlations by about 1.1 cut average error about 10% | `validation/13_validate_item_correlation_inflation.py`, `full_validation.py` |
+| **Against real organizational data the tool does not reproduce item distributions** | 153 items, 34 scales: generated means were 1.70 points below real on a 7-point scale (noise floor 0.08); all items with no anchor received one identical distribution; confidence tiers did not predict accuracy | `full_validation.py`, `validation_output/` |
+
+In short: use the tool to pretest, and read its confidence labels, but do not treat generated item
+means, SDs or scale reliabilities as estimates for organizational scales. Every validation script
+and the decision it supports is listed in [`validation/README.md`](validation/README.md).
 
 ## How it works
 
-1. **Demographic resampling** draws synthetic respondents from real GSS
-   respondents' joint demographic profiles (age, sex, race, marital
-   status, employment, religion), either representatively (weighted by
-   real survey weight) or filtered/targeted to user-specified proportions.
-2. **Item retrieval** embeds each user-supplied item and finds the
-   nearest matching real GSS variable(s) via semantic similarity, using a
-   hybrid strategy: a single best match at high similarity, a
-   quality-filtered blend of several matches at moderate similarity, or
-   no real anchor at low similarity.
-3. **Generation** prompts an LLM to produce a raw endorsement propensity
-   for each item, jointly across all items for each synthetic persona in
-   one call.
-4. **Calibration** maps each propensity's percentile rank within the
-   generated batch onto the real (or population-level, if no strong match
-   was found) response distribution's shape, so the synthetic data's
-   marginal distribution matches real survey data by construction.
+1. **Demographic resampling** draws synthetic respondents from real GSS respondents' joint
+   demographic profiles (age, sex, race, marital status, employment, religion), either
+   representatively (weighted by real survey weight) or filtered/targeted to user-specified
+   proportions.
+2. **Item retrieval** embeds each user-supplied item and finds the nearest matching real GSS
+   variable(s) among 6,064 indexed variables, using a hybrid strategy: a single best match at high
+   similarity (>= .75), a quality-filtered blend of several matches at moderate similarity (.50 to
+   .75), or no real anchor below that.
+3. **Generation** prompts an LLM (gpt-4.1-mini) for each synthetic persona's endorsement propensity
+   for every item, 8 personas per call.
+4. **Calibration** maps each propensity's percentile rank within the generated batch onto the real
+   (or, with no strong match, a generic Likert) response distribution, so the marginal distribution
+   matches that anchor by construction.
 
-Every generated item is labeled with a confidence tier (`high`,
-`moderate`, or `none`) and an empirically-derived expected error rate
-from the accompanying validation studies -- see `validation/`.
+Every item is labeled with a confidence tier (`high`, `moderate` or `none`) and an empirical expected
+error rate from the held-out validation in `validation/`.
 
 ## Repository structure
 
 ```
-generate_dataset.py   Core pipeline (retrieval, calibration, generation)
+generate_dataset.py    Core pipeline (retrieval, calibration, generation)
 app.py                 Streamlit web interface
 requirements.txt
-data/                   Derived data files (see below) -- NOT included in
-                         this repo; you generate them yourself via pipeline/
-pipeline/               One-time setup scripts: build the files in data/
-                         from a raw GSS .sav file
-validation/             Empirical validation studies supporting the
-                         pipeline's design choices (thresholds, batch
-                         size, calibration methods)
-examples/               Example end-to-end generation scripts
+LICENSE                PolyForm Noncommercial 1.0.0
+data/                  Derived GSS data and validation results (the raw .sav is NOT included)
+pipeline/              One-time scripts that build data/ from the raw GSS .sav file
+validation/            Studies supporting each design choice (see validation/README.md)
+full_validation.py     Ground-truth test against real organizational survey data
+validation_output/     design.json (fixed batches) and the saved results of that test
+validation_common.py   Helper for the random-draw scripts below
+test_3scale_draws.py, test_30item_draws.py
+                       Random-draw replications of the correlation findings
+test_bunderson_pathanalysis.py
+                       Comparison with Bunderson & Thompson (2009)
+.github/               Keeps the hosted demo awake (workflow + script)
 ```
 
-## Setup
+Run every script from the repository root.
 
-1. **Create a `data/` folder** at the repo root (the pipeline scripts also
-   create it automatically if it doesn't exist).
+## Quick start (use the tool)
 
-2. **Obtain the GSS cumulative data file** (`.sav` format) directly from
-   NORC: https://gss.norc.org/get-the-data, and place it at
-   `data/gss7224_r3a.sav` (or update `SAV_PATH` in the pipeline scripts to
-   match your filename). This file is not included in this repository --
-   too large for GitHub, and should not be redistributed.
+The derived data files are already in `data/`, so you do not need the raw GSS file.
 
-3. **Install dependencies:**
-   ```bash
-   pip install -r requirements.txt
-   ```
+```bash
+pip install -r requirements.txt
+export OPENAI_API_KEY="your-key-here"
+streamlit run app.py
+```
 
-4. **Set your OpenAI API key** as an environment variable:
-   ```bash
-   export OPENAI_API_KEY="your-key-here"
-   ```
-   For the web interface (`app.py`), also set an access code so the app
-   can be shared as "link + code" without needing individual viewer
-   emails. Locally, create `.streamlit/secrets.toml` (never commit this
-   file -- already excluded by `.gitignore`):
-   ```toml
-   OPENAI_API_KEY = "your-key-here"
-   ACCESS_CODE = "your-chosen-code"
-   ```
-   On Streamlit Community Cloud, set both under the deployed app's
-   Settings -> Secrets instead.
+The web interface asks for an access code. Locally, create `.streamlit/secrets.toml` (never commit
+it; `.gitignore` excludes it):
 
-5. **Run the pipeline scripts in `pipeline/`, in numbered order.** Each
-   writes its output into `data/`:
+```toml
+OPENAI_API_KEY = "your-key-here"
+ACCESS_CODE = "your-chosen-code"
+```
+
+On Streamlit Community Cloud, set both under the app's Settings -> Secrets. To call the pipeline
+from code, import `generate_dataset` and call `generate_dataset(items, n, seed, ...)`, which returns
+`(dataset, coverage_report)`.
+
+## Rebuilding `data/` from the raw GSS file (optional)
+
+1. Download the GSS cumulative data file (`.sav`) from NORC (https://gss.norc.org/get-the-data) and
+   place it at `data/gss7224_r3a.sav` (or edit `SAV_PATH` in the pipeline scripts). It is not
+   redistributed here.
+2. Run the scripts in `pipeline/` in numbered order. Each writes into `data/`:
 
    | Script | Produces |
    |---|---|
-   | `01_check_sav_file.py` | (diagnostic only, no output file) |
+   | `01_check_sav_file.py` | (diagnostic only) |
    | `02_build_full_catalog.py` | `data/gss_variable_catalog.csv` |
    | `03_build_weighted_stats.py` | `data/gss_master_variable_stats.json` |
    | `04_build_embeddings.py` | `data/gss_variable_embeddings.npy`, `data/gss_variable_index.csv` |
    | `05_extract_demographics_pool.py` | `data/gss_demographics_pool.csv`, `data/gss_demographics_value_labels.json` |
    | `06_build_generic_shape.py` | `data/generic_likert_shape.npy` |
 
-6. **Run `validation/05_validate_hybrid_coverage.py`**, which produces
-   `data/hybrid_validation_results.csv` -- also required by
-   `generate_dataset.py` for its expected-error reporting. The other
-   scripts in `validation/` are optional (they reproduce the empirical
-   findings behind the pipeline's design choices) and also write their
-   output CSVs into `data/`. Most are free (reuse existing embeddings, no
-   API calls); a few make small numbers of real API calls at trivial cost
-   (noted in each script's docstring).
+3. Run `validation/05_validate_hybrid_coverage.py` to produce `data/hybrid_validation_results.csv`,
+   which `generate_dataset.py` reads for its expected-error reporting.
 
-7. **Generate data** either via the example scripts in `examples/`, or
-   the web interface:
-   ```bash
-   streamlit run app.py
-   ```
+**Files `generate_dataset.py` and `app.py` need in `data/`:** `gss_variable_embeddings.npy`,
+`gss_variable_index.csv`, `gss_master_variable_stats.json`, `gss_demographics_pool.csv`,
+`gss_demographics_value_labels.json`, `generic_likert_shape.npy`, `hybrid_validation_results.csv`.
 
-### Complete list of files that end up in `data/`
+## Validation against real organizational data
 
-**Required for `generate_dataset.py` / `app.py` to run:**
-- `gss_variable_embeddings.npy`
-- `gss_variable_index.csv`
-- `gss_master_variable_stats.json`
-- `gss_demographics_pool.csv`
-- `gss_demographics_value_labels.json`
-- `generic_likert_shape.npy`
-- `hybrid_validation_results.csv`
+`full_validation.py` generates all 153 items from 34 organizational scales, in 19 batches that keep
+each scale whole, and compares the output with 398 real working adults (Prolific) on mean, SD,
+skewness, tail shares, distribution distance, and item- and scale-level correlations. Every gap is
+read against a noise floor: the gap expected between two independent surveys of 398 people. The
+real-data inputs are derived aggregates only (no individual responses):
+`data/prolific_item_value_proportions.json`, `data/prolific_item_correlation_matrix.csv`,
+`data/prolific_scale_correlation_matrix.csv` and `data/items_metadata_FINAL_34.json`.
 
-**Intermediate pipeline artifact (not read at generation time, but needed to run the pipeline scripts in order):**
-- `gss_variable_catalog.csv`
+```bash
+python full_validation.py             # generate (resumable; 19 batches x about 50 model calls), then analyze
+python full_validation.py --analyze   # re-analyze the saved output, no model calls
+python full_validation.py --design    # show the batches and call count, call nothing
+```
 
-**Not included in this repo (obtain yourself; excluded by `.gitignore`):**
-- `gss7224_r3a.sav` (or your equivalent GSS cumulative file)
-
-**Optional, produced by running the validation studies (supports the paper's empirical claims, not required for the tool to run):**
-- `validation_results.csv`
-- `ensemble_validation_results.csv`
-- `threshold_grid_search.csv`
-- `propensity_std_validation_results.csv`
-- `batch_size_reliability_results.csv`
-- `batch_size_reliability_followup_results.csv`
-- `naive_baseline_comparison_results_N100.csv`, `_N300.csv`, `_N500.csv`, `_N1000.csv` (one file per script
-  `validation/10_validate_vs_naive_baseline_<N>.py`, at that number of synthetic respondents)
-- `item_correlation_comparison.csv` (input to `validation/13_validate_item_correlation_inflation.py`)
-
-
+Results are written to `validation_output/` (`summary_for_paper.csv`, `item_level.csv`,
+`pair_level.csv`, `scale_pair_level.csv`; `design.json` fixes the batches). Run it only with the
+GSS-only `generate_dataset.py`: anchoring on the test sample would make the test circular.
 
 ## Understanding the output
 
-Every generated dataset ships alongside a **coverage report** (per-item retrieval
-match, confidence tier, expected error) and, in the web interface, a
-**data dictionary** explaining every column -- including the actual value
-labels for demographic codes (e.g. what `sex=1` or `race=2` means),
-generated directly from the same file the pipeline uses internally, so it
-can never drift out of sync with the real data. In the web app, this
-appears as an expandable "What do these columns mean?" panel next to the
-results, plus its own downloadable CSV so it travels with the dataset.
-Programmatically, call `build_data_dictionary()` in
-`generate_dataset.py` (no arguments needed -- demographic value labels
-come from a hardcoded, verified `DEMOGRAPHIC_CODEBOOK`, not from
-`gss_demographics_value_labels.json`. That file's raw content is actually
-correct, but GSS attaches ~12 standardized missing-value codes to nearly
-every variable, and code that displayed or looked up labels directly from
-it was tripped up by that noise plus a key-format mismatch. Using a
-verified hardcoded table sidesteps both issues cleanly).
+Every generated dataset ships with a **coverage report** (per-item retrieval match, confidence tier,
+expected error) and, in the web interface, a **data dictionary** for every column, including the
+value labels for demographic codes (for example what `sex=1` means). Demographic labels come from a
+hardcoded, verified `DEMOGRAPHIC_CODEBOOK` in `generate_dataset.py`, not from
+`gss_demographics_value_labels.json`: GSS attaches about 12 standardized missing-value codes to
+nearly every variable, and code that read labels directly from that file was tripped up by that
+noise and a key-format mismatch. Call `build_data_dictionary()` to get it programmatically.
 
 ## Known limitations
 
-- Real-data calibration is only as broad as GSS's own topic coverage;
-  occupation- or domain-specific constructs with no GSS analogue (see
-  `examples/02_generate_zoo_scales.py` for a demonstration) fall back to
-  population-level calibration, clearly labeled as such.
-- Demographic resampling treats user-specified gender and race targets as
-  independent of each other (a disclosed simplifying assumption).
-- All validation is proxy-based (held-out real GSS items standing in for
-  novel items); ground-truth validation against newly-collected human
-  response data is planned future work.
+- **Coverage.** A real anchor exists for about a third of novel items. Organizational constructs
+  usually fall back to a generic Likert shape that is identical for every unanchored item.
+- **Distributions.** On organizational items, generated answers pile up at the low end while real
+  answers lean toward agreement (see the table above). Flipping the output when the model judges an
+  item to be mostly agreed with roughly halved the distance on 62 items in a post-hoc check; this is
+  in-sample and not part of the tool.
+- **Correlations.** Generated correlations run too high, most within scales, so scale reliability
+  (Cronbach's alpha) will be overstated; alpha itself has not been tested. Individual generated
+  correlations are imprecise (mean absolute error about 0.23, about four times the noise floor).
+- **Confidence tiers** were validated within the GSS. On organizational items they did not predict
+  accuracy.
+- **Population and model.** One real comparison sample (working adults), one language model
+  (a proprietary API), and U.S.-only anchors. Accuracy for demographic subgroups has not been tested.
+- Demographic resampling treats user-specified gender and race targets as independent of each other.

@@ -1,0 +1,61 @@
+set,item,mean_propensity,std_propensity,n_responses
+work_attitudes,I feel valued by my organization,0.5456,0.07813219566862305,100
+work_attitudes,My manager communicates clearly,0.5884,0.0752956838072409,100
+work_attitudes,I often feel stressed at work,0.5922999999999999,0.0753638507508739,100
+work_attitudes,I am proud of where I work,0.6006000000000001,0.08569504069664709,100
+work_attitudes,I have opportunities to grow in my role,0.5163,0.09599640618273166,100
+work_attitudes,My work is meaningful to me,0.5992000000000001,0.07693737713231455,100
+work_attitudes,I feel supported by my team,0.5962,0.07274310963933284,100
+work_attitudes,I am satisfied with my compensation,0.4917,0.08133947381191989,100
+work_attitudes,I have good work-life balance,0.5436,0.0772595625149405,100
+work_attitudes,My contributions are recognized,0.5258,0.08364424666407128,100
+work_attitudes,I am motivated to do my best work,0.5982999999999999,0.07742163780236117,100
+work_attitudes,I feel included at work,0.5953,0.07357248126847428,100
+work_attitudes,I have the resources I need to do my job,0.5518,0.07197749648327594,100
+work_attitudes,I feel respected by my colleagues,0.6055,0.07519807178378976,100
+work_attitudes,I receive helpful feedback,0.536,0.08237718130647587,100
+trust_and_social,Most people can be trusted,0.49169999999999997,0.07555203504870005,100
+trust_and_social,I feel connected to my community,0.5824999999999999,0.06863490365695867,100
+trust_and_social,I believe people are generally honest,0.5307,0.0759375401234462,100
+trust_and_social,I trust my neighbors,0.53,0.07738216848861242,100
+trust_and_social,I feel a sense of belonging where I live,0.5888,0.07570046234997511,100
+trust_and_social,People in my life support me,0.6513000000000001,0.07398182209164626,100
+trust_and_social,I have close friends I can rely on,0.6476999999999999,0.07093454729537646,100
+trust_and_social,I feel comfortable asking others for help,0.5988,0.0805019254428116,100
+trust_and_social,I believe most people mean well,0.5409999999999999,0.0758485332752058,100
+trust_and_social,I feel socially connected,0.591,0.0768570100901668,100
+trust_and_social,I trust institutions to act in my interest,0.3968,0.09184639350567882,100
+trust_and_social,I feel a strong sense of community,0.5699000000000001,0.0800561677823764,100
+trust_and_social,I am generally optimistic about people,0.5311,0.08003617931910542,100
+trust_and_social,I feel accepted by those around me,0.5897,0.0726285756434752,100
+trust_and_social,I believe cooperation is usually possible,0.5576,0.07948735748532591,100
+personal_wellbeing,I feel optimistic about my future,0.5904,0.07651039145109637,100
+personal_wellbeing,I am generally a happy person,0.5989999999999999,0.07410128204019144,100
+personal_wellbeing,I handle stress well,0.5578,0.07071888008163026,100
+personal_wellbeing,I feel confident in my abilities,0.6017,0.07371641608217262,100
+personal_wellbeing,I am satisfied with my life overall,0.5683,0.08197627705623134,100
+personal_wellbeing,I feel a sense of purpose,0.5579999999999999,0.09827512401416748,100
+personal_wellbeing,I am comfortable with who I am,0.5931,0.07764914680793343,100
+personal_wellbeing,I feel emotionally stable,0.5643,0.07370556288367926,100
+personal_wellbeing,I recover quickly from setbacks,0.5705,0.07384273830242213,100
+personal_wellbeing,I feel in control of my life,0.5815,0.0803041094838863,100
+personal_wellbeing,I am generally calm under pressure,0.5605,0.07369362251918411,100
+personal_wellbeing,I feel good about my personal growth,0.5875,0.0788844091059824,100
+personal_wellbeing,I am able to relax when I need to,0.5581999999999999,0.07483822552679881,100
+personal_wellbeing,I feel physically healthy,0.6122,0.06634123905987886,100
+personal_wellbeing,I am content with my daily life,0.5724,0.07811683557338968,100
+general_attitudes,I value spending time with family,0.7363,0.10357272807066539,100
+general_attitudes,I am open to trying new experiences,0.6247,0.09187442516826974,100
+general_attitudes,I believe hard work leads to success,0.7137,0.07090352600541104,100
+general_attitudes,I enjoy learning new things,0.6809000000000001,0.07202909134509472,100
+general_attitudes,I am adaptable to change,0.6612,0.057589582391262384,100
+general_attitudes,I value honesty in relationships,0.7347,0.10050328352844996,100
+general_attitudes,I take pride in doing things well,0.7120000000000001,0.06018305409332432,100
+general_attitudes,I am curious about the world,0.6579,0.09414132992474665,100
+general_attitudes,I value fairness in how people are treated,0.7404,0.0659836343345833,100
+general_attitudes,I enjoy helping others,0.7117,0.07314444613229361,100
+general_attitudes,I am patient with people who disagree with me,0.5825,0.06302975487815257,100
+general_attitudes,I value personal responsibility,0.7486,0.06359276688429276,100
+general_attitudes,I am comfortable making decisions,0.6879000000000002,0.04652515448657855,100
+general_attitudes,I value keeping my commitments,0.7449999999999999,0.0685054742338158,100
+general_attitudes,I enjoy solving problems,0.7132000000000001,0.04923169710664056,100

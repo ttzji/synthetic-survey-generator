@@ -1,0 +1,374 @@
+[
+  {
+    "prolific_column": "mentorsubordinates1",
+    "text": "I give career-related advice to my subordinates",
+    "scale": "mentorsubordinates",
+    "reverse": false
+  },
+  {
+    "prolific_column": "mentorsubordinates2",
+    "text": "I offer job-related advice to my subordinates",
+    "scale": "mentorsubordinates",
+    "reverse": false
+  },
+  {
+    "prolific_column": "mentorsubordinates3",
+    "text": "I offer guidance on job-related matter and/or career-related issue to my subordinates",
+    "scale": "mentorsubordinates",
+    "reverse": false
+  },
+  {
+    "prolific_column": "mentorubordinates4",
+    "text": "I serve as a mentor to my subordinates",
+    "scale": "mentorsubordinates",
+    "reverse": false
+  },
+  {
+    "prolific_column": "transformationalleadership1",
+    "text": "I inspire others with my plans for the future",
+    "scale": "transformationalleadership",
+    "reverse": false
+  },
+  {
+    "prolific_column": "transformationalleadership2",
+    "text": "I foster collaboration among work groups",
+    "scale": "transformationalleadership",
+    "reverse": false
+  },
+  {
+    "prolific_column": "transformationalleadership3",
+    "text": "I encourage employees to be \"team players\"",
+    "scale": "transformationalleadership",
+    "reverse": false
+  },
+  {
+    "prolific_column": "transformationalleadership4",
+    "text": "I lead by \"doing\" rather than simply by \"telling\"",
+    "scale": "transformationalleadership",
+    "reverse": false
+  },
+  {
+    "prolific_column": "transformationalleadership5",
+    "text": "I provide a good model to follow",
+    "scale": "transformationalleadership",
+    "reverse": false
+  },
+  {
+    "prolific_column": "ethicalleadership1",
+    "text": "I listen to what my subordinates have to say",
+    "scale": "ethicalleadership",
+    "reverse": false
+  },
+  {
+    "prolific_column": "ethicalleadership2",
+    "text": "I discipline my subordinates who violate ethical standards",
+    "scale": "ethicalleadership",
+    "reverse": false
+  },
+  {
+    "prolific_column": "ethicalleadership3",
+    "text": "I have the best interests of my subordinates in mind",
+    "scale": "ethicalleadership",
+    "reverse": false
+  },
+  {
+    "prolific_column": "ethicalleadership4",
+    "text": "I discuss business ethics or values with my subordinates",
+    "scale": "ethicalleadership",
+    "reverse": false
+  },
+  {
+    "prolific_column": "ethicalleadership5",
+    "text": "I set an example of how to do things the right way in terms of ethics",
+    "scale": "ethicalleadership",
+    "reverse": false
+  },
+  {
+    "prolific_column": "teamwork_1",
+    "text": "I prefer to work with others in a group rather than working alone",
+    "scale": "teamwork",
+    "reverse": false
+  },
+  {
+    "prolific_column": "teamwork_2.reverse.",
+    "text": "Only those who depend on themselves get ahead in life",
+    "scale": "teamwork",
+    "reverse": true
+  },
+  {
+    "prolific_column": "teamwork_3.reverse.",
+    "text": "A group is more productive when its members follow their own interests and concern",
+    "scale": "teamwork",
+    "reverse": true
+  },
+  {
+    "prolific_column": "teamwork_4.reverse.",
+    "text": "A group is most efficient when its members do what they think is best rather than doing what the group wants them to do",
+    "scale": "teamwork",
+    "reverse": true
+  },
+  {
+    "prolific_column": "teamwork_5.reverse.",
+    "text": "It annoys me when other people perform better than I do",
+    "scale": "teamwork",
+    "reverse": true
+  },
+  {
+    "prolific_column": "teamwork_6.reverse.",
+    "text": "If a group is slowing me down, it is better to leave and work alone",
+    "scale": "teamwork",
+    "reverse": true
+  },
+  {
+    "prolific_column": "valuegrowth1",
+    "text": "stimulating and challenging work",
+    "scale": "valuegrowth",
+    "reverse": false
+  },
+  {
+    "prolific_column": "valuegrowth2",
+    "text": "chances to exercise independent thought and action",
+    "scale": "valuegrowth",
+    "reverse": false
+  },
+  {
+    "prolific_column": "valuegrowth3",
+    "text": "opportunity to learn new things",
+    "scale": "valuegrowth",
+    "reverse": false
+  },
+  {
+    "prolific_column": "valuegrowth4",
+    "text": "opportunities for personal growth and development",
+    "scale": "valuegrowth",
+    "reverse": false
+  },
+  {
+    "prolific_column": "globalmindset_1",
+    "text": "I consider myself as open to ideas from other countries and cultures as I am to ideas from my own country and culture of origin",
+    "scale": "globalmindset",
+    "reverse": false
+  },
+  {
+    "prolific_column": "globalmindset_2",
+    "text": "Finding myself in a new cultural setting will cause me more excitement than fear or anxiety",
+    "scale": "globalmindset",
+    "reverse": false
+  },
+  {
+    "prolific_column": "globalmindset_3",
+    "text": "I regard my values to be a hybrid of values acquired from multiple cultures as opposed to just one culture",
+    "scale": "globalmindset",
+    "reverse": false
+  },
+  {
+    "prolific_column": "globalmindset_4",
+    "text": "In interacting with others, national origin has an impact on whether or not I assign equal status to them",
+    "scale": "globalmindset",
+    "reverse": true
+  },
+  {
+    "prolific_column": "value_patriotism1",
+    "text": "I love my country",
+    "scale": "value_patriotism",
+    "reverse": false
+  },
+  {
+    "prolific_column": "value_patriotism2",
+    "text": "I am proud to be an American",
+    "scale": "value_patriotism",
+    "reverse": false
+  },
+  {
+    "prolific_column": "value_patriotism3",
+    "text": "In a sense, I am emotionally attached to my country and emotionally affected by its actions",
+    "scale": "value_patriotism",
+    "reverse": false
+  },
+  {
+    "prolific_column": "value_civicduty1",
+    "text": "I believe that citizens have an obligation to vote in elections",
+    "scale": "value_civicduty",
+    "reverse": false
+  },
+  {
+    "prolific_column": "value_civicduty2",
+    "text": "To me, the phrase \"duty, honor, and country\" stirs deeply felt emotions",
+    "scale": "value_civicduty",
+    "reverse": false
+  },
+  {
+    "prolific_column": "value_civicduty3",
+    "text": "I am willing to go to great lengths to fulfill my obligations to my country",
+    "scale": "value_civicduty",
+    "reverse": false
+  },
+  {
+    "prolific_column": "value_mentalhealth1.reverse",
+    "text": "How often have you felt lonely?",
+    "scale": "value_mentalhealth",
+    "reverse": true
+  },
+  {
+    "prolific_column": "value_mentalhealth2",
+    "text": "How often have you felt emotionally stable?",
+    "scale": "value_mentalhealth",
+    "reverse": false
+  },
+  {
+    "prolific_column": "value_mentalhealth3",
+    "text": "How often have you felt calm and peaceful?",
+    "scale": "value_mentalhealth",
+    "reverse": false
+  },
+  {
+    "prolific_column": "reilience1",
+    "text": "I am able to adapt to changes",
+    "scale": "resilience",
+    "reverse": false
+  },
+  {
+    "prolific_column": "reilience2",
+    "text": "I see myself as a strong person",
+    "scale": "resilience",
+    "reverse": false
+  },
+  {
+    "prolific_column": "reilience3",
+    "text": "I am not easily discouraged by failure",
+    "scale": "resilience",
+    "reverse": false
+  },
+  {
+    "prolific_column": "reilience4",
+    "text": "I can stay focused under pressure",
+    "scale": "resilience",
+    "reverse": false
+  },
+  {
+    "prolific_column": "reilience5",
+    "text": "I can achieve goals despite obstacles",
+    "scale": "resilience",
+    "reverse": false
+  },
+  {
+    "prolific_column": "calling1",
+    "text": "The work I do feels like my calling in life",
+    "scale": "calling",
+    "reverse": false
+  },
+  {
+    "prolific_column": "calling2",
+    "text": "It sometimes feels like I was destined to do the work I do",
+    "scale": "calling",
+    "reverse": false
+  },
+  {
+    "prolific_column": "calling3",
+    "text": "The work I do feels like my niche in life",
+    "scale": "calling",
+    "reverse": false
+  },
+  {
+    "prolific_column": "calling4",
+    "text": "I am definitely the sort of person who fits in my line of work",
+    "scale": "calling",
+    "reverse": false
+  },
+  {
+    "prolific_column": "calling5",
+    "text": "My passion for the work I do goes back to my childhood",
+    "scale": "calling",
+    "reverse": false
+  },
+  {
+    "prolific_column": "calling6",
+    "text": "I was meant to do the work I do",
+    "scale": "calling",
+    "reverse": false
+  },
+  {
+    "prolific_column": "selfconstrual_interdependent1",
+    "text": "If my brother or sister (or a close family member of mine) fails, I feel responsible.",
+    "scale": "selfconstrual_interdependent",
+    "reverse": false
+  },
+  {
+    "prolific_column": "selfconstrual_interdepedent2",
+    "text": "My happiness depends on the happiness of those around me.",
+    "scale": "selfconstrual_interdependent",
+    "reverse": false
+  },
+  {
+    "prolific_column": "selfconstrual_interdepedent3",
+    "text": "It is important for me to maintain harmony within my group.",
+    "scale": "selfconstrual_interdependent",
+    "reverse": false
+  },
+  {
+    "prolific_column": "selfconstrual_interdepedent4",
+    "text": "It is important to me to respect decisions made by the group.",
+    "scale": "selfconstrual_interdependent",
+    "reverse": false
+  },
+  {
+    "prolific_column": "selfconstrual_interdepedent5",
+    "text": "Relationships are more important than accomplishments.",
+    "scale": "selfconstrual_interdependent",
+    "reverse": false
+  },
+  {
+    "prolific_column": "needforcognition_1",
+    "text": "I like to have the responsibility of handling a situation that requires a lot of thinking.",
+    "scale": "needforcognition",
+    "reverse": false
+  },
+  {
+    "prolific_column": "needforcognition_2reverse",
+    "text": "Thinking is not my idea of fun.",
+    "scale": "needforcognition",
+    "reverse": true
+  },
+  {
+    "prolific_column": "needforcognition_3",
+    "text": "I really enjoy a task that involves coming up with new solutions to problems.",
+    "scale": "needforcognition",
+    "reverse": false
+  },
+  {
+    "prolific_column": "big5_2",
+    "text": "Critical, quarrelsome.",
+    "scale": "agreeable",
+    "reverse": true
+  },
+  {
+    "prolific_column": "big5_7",
+    "text": "Sympathetic, warm.",
+    "scale": "agreeable",
+    "reverse": false
+  },
+  {
+    "prolific_column": "big5_4",
+    "text": "Anxious, easily upset.",
+    "scale": "neurotic",
+    "reverse": false
+  },
+  {
+    "prolific_column": "big5_9",
+    "text": "Calm, emotionally stable.",
+    "scale": "neurotic",
+    "reverse": true
+  },
+  {
+    "prolific_column": "big5_5",
+    "text": "Open to new experiences, complex.",
+    "scale": "openness",
+    "reverse": false
+  },
+  {
+    "prolific_column": "big5_10",
+    "text": "Conventional, uncreative.",
+    "scale": "openness",
+    "reverse": true
+  }
+]

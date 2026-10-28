@@ -57,7 +57,7 @@ st.caption(
 # =============================================================================
 
 st.header("1. Survey items")
-st.write("Enter one item per line. Mark each item's type below.")
+st.write("Enter one item per line. The Likert-scale items go into the first box. The binary items go into the second box.")
 
 likert_text = st.text_area(
     "Likert-scale items (one per line)",

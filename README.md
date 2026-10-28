@@ -4,24 +4,10 @@ Generates synthetic survey responses for researcher-supplied scale items, calibr
 U.S. General Social Survey (GSS) answer distributions where a strong enough match exists, with a
 confidence label and an empirical error rate for every item.
 
-**Intended use: pretesting** item wording, response formats, analysis scripts and floor/ceiling
-effects. It is not a substitute for human data in inference.
+**Intended use: pretesting** organizational research ideas. It is not a substitute for human data in inference.
 **Scope:** the GSS is a U.S. survey, so all calibration reflects U.S. adults.
 **License:** [PolyForm Noncommercial 1.0.0](LICENSE). Free for research, teaching and other
 noncommercial use. For commercial use, contact Jack Zhang (jleaf1983@gmail.com).
-
-## What the validation shows
-
-| Finding | Evidence | Where |
-|---|---|---|
-| Calibration beats raw model output on GSS-covered items | Distribution error fell 43.2%, 40.8%, 39.6% and 38.2% in four runs (N = 100 to 1,000 synthetic respondents; all p <= .004) | `validation/10_validate_vs_naive_baseline_*.py`, `validation/results/naive_baseline_comparison_results_N*.csv` |
-| A confident real anchor exists for a third of novel items | 33.2% of the 6,064 held-out GSS variables pass the production gate (2,012), against 23.7% if only the single best match were used | `validation/05_validate_hybrid_coverage.py`, `data/hybrid_validation_results.csv` |
-| Generated correlations run too high | About +0.07 between scales and +0.16 within scales, against 398 real working adults. Dividing off-diagonal correlations by about 1.1 cut average error about 10% | `validation/12_validate_against_real_data.py` |
-| **Against real organizational data the tool does not reproduce item distributions** | 153 items, 34 scales: generated means were 1.70 points below real on a 7-point scale (noise floor 0.08); all items with no anchor received one identical distribution; confidence tiers did not predict accuracy | `validation/12_validate_against_real_data.py`, `validation/results/real_data_test/` |
-
-In short: use the tool to pretest, and read its confidence labels, but do not treat generated item
-means, SDs or scale reliabilities as estimates for organizational scales. Every validation script,
-what it tests and the file it writes is listed in [`validation/README.md`](validation/README.md).
 
 ## How it works
 
@@ -39,7 +25,7 @@ what it tests and the file it writes is listed in [`validation/README.md`](valid
    (or, with no strong match, a generic Likert) response distribution, so the marginal distribution
    matches that anchor by construction.
 
-Every item is labeled with a confidence tier (`high`, `moderate` or `none`) and an empirical expected
+Every item is labeled with a confidence label (`high`, `moderate` or `low`) and an empirical expected
 error rate from the held-out validation in `validation/`.
 
 ## Repository structure
@@ -131,26 +117,9 @@ Results are written to `validation/results/real_data_test/` (`summary_for_paper.
 
 ## Understanding the output
 
-Every generated dataset ships with a **coverage report** (per-item retrieval match, confidence tier,
+Every generated dataset ships with a **coverage report** (per-item retrieval match, confidence label,
 expected error) and, in the web interface, a **data dictionary** for every column, including the
 value labels for demographic codes (for example what `sex=1` means). Demographic labels come from a
 verified `DEMOGRAPHIC_CODEBOOK` in `generate_dataset.py` and not from
 `gss_demographics_value_labels.json`, because the GSS attaches about 12 standardized missing-value codes to
 nearly every variable. Call `build_data_dictionary()` to get the dictionary programmatically.
-
-## Known limitations
-
-- **Coverage.** A real anchor exists for about a third of novel items. Organizational constructs
-  usually fall back to a generic Likert shape that is identical for every unanchored item.
-- **Distributions.** On organizational items, generated answers pile up at the low end while real
-  answers lean toward agreement (see the table above). Flipping the output when the model judges an
-  item to be mostly agreed with roughly halved the distance on 62 items in a post-hoc check; this is
-  in-sample and not part of the tool (`validation/13_test_candidate_fixes.py`).
-- **Correlations.** Generated correlations run too high, most within scales, so scale reliability
-  (Cronbach's alpha) will be overstated; alpha itself has not been tested. Individual generated
-  correlations are imprecise (mean absolute error about 0.23, about four times the noise floor).
-- **Confidence tiers** were validated within the GSS. On organizational items they did not predict
-  accuracy.
-- **Population and model.** One real comparison sample (working adults), one language model
-  (a proprietary API), and U.S.-only anchors. Accuracy for demographic subgroups has not been tested.
-- Demographic resampling treats user-specified gender and race targets as independent of each other.

@@ -351,7 +351,7 @@ def build_data_dictionary(value_labels=None):
         "Overall confidence in this item's real-data grounding.",
         "high = single strong match, empirically clears the error bar ~68% of the "
         "time; moderate = blended match, clears it ~50% of the time; "
-        "none = population-level calibration only, no specific real-data anchor.")
+        "low = population-level calibration only, no specific real-data anchor.")
     add("expected_error",
         "Historically observed calibration error for matches at this "
         "similarity level, from internal validation studies -- a rough "
@@ -653,7 +653,7 @@ def determine_confidence_tier(info):
     "moderate" -- ensemble method (candidates already guaranteed
                   N>=200/years>1 by construction) -- reported with its own
                   historical error rate rather than a pass/fail label
-    "none"     -- no usable method found, or single_best failed its checks
+    "low"      -- no usable method found, or single_best failed its checks
     """
     n = info["stats_n"]
     years = info["stats_years"]
@@ -663,7 +663,7 @@ def determine_confidence_tier(info):
         print(f"  ** NO REAL ANCHOR for '{info['item_text'][:50]}...': "
               f"similarity too low or insufficient quality candidates for ensemble. "
               f"Using population_calibrated estimate. **")
-        return "none"
+        return "low"
 
     if method == "single_best":
         issues = []
@@ -677,7 +677,7 @@ def determine_confidence_tier(info):
             print(f"  ** LOW CONFIDENCE for '{info['item_text'][:50]}...' -> "
                   f"{info['matched_variable']}: {'; '.join(issues)}. "
                   f"Using population_calibrated estimate instead. **")
-            return "none"
+            return "low"
         return "high"
 
     if method == "ensemble":
@@ -688,7 +688,7 @@ def determine_confidence_tier(info):
               f"with its own historical error rate rather than a pass/fail label. **")
         return "moderate"
 
-    return "none"
+    return "low"
 
 # =========================================================================
 # PART 3: Joint LLM generation per persona batch
@@ -846,7 +846,7 @@ def generate_dataset(items, n, seed, mode="representative",
 
         tier = determine_confidence_tier(items_info[-1])
         items_info[-1]["confidence_tier"] = tier
-        items_info[-1]["confident_match"] = tier != "none"  # kept for simple filtering
+        items_info[-1]["confident_match"] = tier != "low"  # kept for simple filtering
 
     print(f"\n=== Step 3: Generating responses in batches of {batch_size} ===")
     personas = [describe_persona(row, value_labels) for _, row in demo_df.iterrows()]

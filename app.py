@@ -79,7 +79,13 @@ with col1:
     n = st.number_input("Sample size (N)", min_value=10, max_value=1000, value=100, step=10)
     st.caption("Larger N takes proportionally longer to generate.")
 with col2:
-    seed = st.number_input("Random seed (for reproducibility)", min_value=0, value=42, step=1)
+    seed = st.number_input(
+        "Random seed (for reproducibility)", min_value=0, value=42, step=1,
+        help="Any whole number works. Keep the same seed to reproduce a dataset; there is no need to change it.",
+    )
+    st.caption("The seed lets anyone reproduce your dataset: the same items, sample settings and seed give the "
+               "same respondents and the same answer distribution for each item. Any whole number works, and "
+               "you do not need to change it.")
 
 mode = st.radio(
     "Sample type",
@@ -183,7 +189,7 @@ if "result_df" in st.session_state:
     st.write(
         f"**{tier_counts.get('high', 0)}** item(s) at high confidence (strong real-data match) · "
         f"**{tier_counts.get('moderate', 0)}** at moderate confidence (blended real-data match) · "
-        f"**{tier_counts.get('none', 0)}** using population-level calibration (no strong real-data match found)"
+        f"**{tier_counts.get('low', 0)}** at low confidence (no close real-data match; a generic GSS answer pattern was used)"
     )
     st.dataframe(coverage[[
         "item", "method", "matched_variable", "similarity_top1",

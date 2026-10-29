@@ -19,13 +19,12 @@ different survey (a real sample of working adults, as a test set), and neither f
 | `10_validate_vs_naive_baseline_100.py`, `_300.py`, `_500.py`, `_1000.py` | Calibrated pipeline against raw model output on 40 held-out GSS items, at that many synthetic respondents | yes | `results/naive_baseline_comparison_results_N<N>.csv` |
 | `11_validate_min_real_n.py` | Is 200 a sensible minimum number of real respondents for an anchor? Measures the sampling noise of an anchor at 50 to 500 respondents and expresses it as a share of the benefit of calibration (about 17% at 200 respondents, 23% at 100, 35% at 50; no sharp elbow). Needs the raw GSS `.sav` | no | `results/min_real_n_validation_results.csv` |
 | `12_validate_against_real_data.py` | Ground truth: 153 items from 34 organizational scales against 398 real working adults, each gap read against a noise floor | yes (to generate; analysis is free) | `results/real_data_test/` |
-| `13_test_candidate_fixes.py` | Exploratory: would simple fixes close the gaps that 12 found (rating-based binning, flipping the output, removing the general agreement tendency)? In-sample on 62 items, so a first look and not a validation | no | `results/candidate_fixes_results.csv` |
-| `14_compare_alpha.py` | Does synthetic data overstate scale reliability? Cronbach's alpha, generated against real, for all 34 scales of the ground-truth test and the 16 scales of the pilot run. Needs the saved batches of 12 and `reference_data/prolific_alpha_benchmark.csv` | no | `results/alpha_comparison.csv` |
+| `13_compare_alpha.py` | Does synthetic data overstate scale reliability? Cronbach's alpha, generated against real, for all 34 scales of the ground-truth test and the 16 scales of the pilot run. Needs the saved batches of 12 and `reference_data/prolific_alpha_benchmark.csv` | no | `results/alpha_comparison.csv` |
 
 Folders:
 
 - `reference_data/` holds aggregates of the real survey used as the test set in 12 and 13, plus the 62-item
-  generated run that 13 analyzes. See its README.
+  generated pilot run whose reliability 13 compares. See its README.
 - `results/` holds the result files above. Scripts 01 to 06 and 13 are free to rerun and reproduce them; so is 11 if
   you have the raw GSS file. Scripts 07 to 10 and 12 call the model, so rerunning them costs API calls and their saved
   results are included instead (12 can be re-analyzed for free from its saved batches with `--analyze`).

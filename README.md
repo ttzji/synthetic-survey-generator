@@ -42,7 +42,7 @@ validation/             Everything that tests the tool (see validation/README.md
   01-10                 Design-choice studies, built and tested on GSS data only
   11                    Minimum real sample size for an anchor
   12                    Ground-truth test against a real organizational survey
-  13                    Candidate fixes for what 12 found (exploratory)
+  13                    Scale reliability (Cronbach's alpha), generated against real
   reference_data/       The real survey's aggregates, used only as a test set (never as an anchor)
   results/              Result files of the scripts above; results/real_data_test/ holds script 12's
 .github/                Scheduled workflow that pings the hosted demo so it stays awake (not needed to use the tool)
@@ -114,6 +114,10 @@ python validation/12_validate_against_real_data.py --design    # show the batche
 
 Results are written to `validation/results/real_data_test/` (`summary_for_paper.csv`, `item_level.csv`,
 `pair_level.csv`, `scale_pair_level.csv`; `design.json` fixes the batches).
+
+`validation/13_compare_alpha.py` compares Cronbach's alpha for the 34 scales: generated alpha averaged .83
+against a real .73 and was higher for 29 scales, so synthetic data overstate scale reliability. It needs only
+the saved output of script 12 and makes no model calls.
 
 ## Understanding the output
 

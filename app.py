@@ -47,9 +47,9 @@ if not st.session_state["authenticated"]:
 
 st.title("Synthetic Survey Data Generator")
 st.caption(
-    "Generates a synthetic dataset calibrated against real U.S. General Social "
-    "Survey (GSS) response data where a good match exists, with transparent "
-    "confidence labeling for every item. Scope: U.S. adult population only."
+    "Generates a synthetic dataset calibrated against human response data in the U.S. "
+    "General Social Survey (GSS) where a good match exists, with transparent confidence "
+    "labeling for every item. Scope: U.S. adult population."
 )
 
 # =============================================================================
@@ -62,7 +62,7 @@ st.write("Enter one item per line. The Likert-scale items go into the first box.
 likert_text = st.text_area(
     "Likert-scale items (one per line)",
     height=150,
-    placeholder="I feel my contributions are valued at this organization\nMy supervisor gives me clear feedback on my performance",
+    placeholder="I can trust my manager to look out for my best interest\nI am satisfied with my job for the time being",
 )
 binary_text = st.text_area(
     "Binary (yes/no) items (one per line) -- optional",
@@ -83,13 +83,13 @@ with col2:
         "Random seed (for reproducibility)", min_value=0, value=42, step=1,
         help="Any whole number works. Keep the same seed to reproduce a dataset; there is no need to change it.",
     )
-    st.caption("The seed lets anyone reproduce your dataset: the same items, sample settings and seed give the "
-               "same respondents and the same answer distribution for each item. Any whole number works, and "
-               "you do not need to change it.")
+    st.caption("With the same items, sample settings and seed, the tool will generate the same respondents "
+               "and the same answer distribution for each item. Any whole number works, and you do not need "
+               "to change it.")
 
 mode = st.radio(
     "Sample type",
-    ["Representative (no choices -- full U.S. adult population)", "Custom"],
+    ["Representative (full U.S. adult population)", "Custom"],
 )
 mode_key = "representative" if mode.startswith("Representative") else "custom"
 

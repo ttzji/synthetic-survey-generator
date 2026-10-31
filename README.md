@@ -1,27 +1,27 @@
 # Synthetic Survey Data Generator
 
-Generates synthetic survey responses for researcher-supplied scale items, calibrated against real
-U.S. General Social Survey (GSS) answer distributions where a strong enough match exists, with a
+Generates synthetic survey responses for researcher-supplied scale items, calibrated against human
+answer distributions in the U.S. General Social Survey (GSS), with a
 confidence label and an empirical error rate for every item.
 
-**Intended use: pretesting** organizational research ideas. It is not a substitute for human data in inference.
+**Intended use: pretesting** organizational research ideas. It is not a substitute for human data.
 **Scope:** the GSS is a U.S. survey, so all calibration reflects U.S. adults.
 **License:** [PolyForm Noncommercial 1.0.0](LICENSE). Free for research, teaching and other
 noncommercial use. For commercial use, contact Jack Zhang (jleaf1983@gmail.com).
 
 ## How it works
 
-1. **Demographic resampling** draws synthetic respondents from real GSS respondents' joint
+1. **Demographic resampling** draws synthetic respondents from GSS respondents' joint
    demographic profiles (age, sex, race, marital status, employment, religion), either
-   representatively (weighted by real survey weight) or filtered/targeted to user-specified
+   representatively (weighted by the GSS survey weights) or filtered/targeted to user-specified
    proportions.
-2. **Item retrieval** embeds each user-supplied item and finds the nearest matching real GSS
+2. **Item retrieval** embeds each user-supplied item and finds the nearest matching GSS
    variable(s) among 6,064 indexed variables, using a hybrid strategy: a single best match at high
    similarity (>= .75), a quality-filtered blend of several matches at moderate similarity (.50 to
-   .75), or no real anchor below that.
+   .75), or no GSS anchor below that.
 3. **Generation** prompts an LLM (gpt-4.1-mini) for each synthetic persona's endorsement propensity
    for every item, 8 personas per call.
-4. **Calibration** maps each propensity's percentile rank within the generated batch onto the real
+4. **Calibration** maps each propensity's percentile rank within the generated batch onto the human
    (or, with no strong match, a generic Likert) response distribution, so the marginal distribution
    matches that anchor by construction.
 
@@ -39,11 +39,11 @@ LICENSE                 PolyForm Noncommercial 1.0.0
 data/                   What the tool reads: derived GSS files only (the raw .sav is NOT included)
 pipeline/               One-time scripts that build data/ from the raw GSS .sav file
 validation/             Everything that tests the tool (see validation/README.md)
-  01-10                 Design-choice studies, built and tested on GSS data only
-  11                    Minimum real sample size for an anchor
-  12                    Ground-truth test against a real organizational survey
-  13                    Scale reliability (Cronbach's alpha), generated against real
-  reference_data/       The real survey's aggregates, used only as a test set (never as an anchor)
+  01-10                 Design-choice studies; no survey other than the GSS is used
+  11                    Minimum human sample size for an anchor
+  12                    Ground-truth test against a human organizational survey
+  13                    Scale reliability (Cronbach's alpha), synthetic against human
+  reference_data/       The human survey's aggregates, used only as a test set (never as an anchor)
   results/              Result files of the scripts above; results/real_data_test/ holds script 12's
 .github/                Scheduled workflow that pings the hosted demo so it stays awake (not needed to use the tool)
 ```
@@ -96,13 +96,13 @@ from code, import `generate_dataset` and call `generate_dataset(items, n, seed, 
 `gss_variable_index.csv`, `gss_master_variable_stats.json`, `gss_demographics_pool.csv`,
 `gss_demographics_value_labels.json`, `generic_likert_shape.npy`, `hybrid_validation_results.csv`.
 
-## Validation against real organizational data
+## Validation against human data from Prolific
 
 The tool is built only on the GSS. `validation/12_validate_against_real_data.py` tests it against a separate
-real survey of 398 working adults (Prolific): it generates all 153 items from 34 organizational scales, in 19
-batches that keep each scale whole, and compares the output with the real answers on mean, SD, skewness, tail
+human survey of 398 working adults (Prolific): it generates all 153 items from 34 organizational scales, in 19
+batches that keep each scale whole, and compares the output with the human answers on mean, SD, skewness, tail
 shares, distribution distance, and item- and scale-level correlations. Every gap is read against a noise
-floor: the gap expected between two independent surveys of 398 people. The real survey is never an anchor:
+floor: the gap expected between two independent surveys of 398 people. The human survey is never an anchor:
 `generate_dataset.py` has no code that reads it, and anchoring on the test sample would make the test
 circular. Its derived aggregates (no individual responses) are in `validation/reference_data/`.
 
@@ -115,14 +115,15 @@ python validation/12_validate_against_real_data.py --design    # show the batche
 Results are written to `validation/results/real_data_test/` (`summary_for_paper.csv`, `item_level.csv`,
 `pair_level.csv`, `scale_pair_level.csv`; `design.json` fixes the batches).
 
-`validation/13_compare_alpha.py` compares Cronbach's alpha for the 34 scales: generated alpha averaged .83
-against a real .73 and was higher for 29 scales, so synthetic data overstate scale reliability. It needs only
+`validation/13_compare_alpha.py` compares Cronbach's alpha for the 34 scales: synthetic alpha averaged .83
+against a human .73 and was higher for 29 scales, so synthetic data overstate scale reliability. It needs only
 the saved output of script 12 and makes no model calls.
 
 ## Understanding the output
 
 Every generated dataset ships with a **coverage report** (per-item retrieval match, confidence label,
-expected error) and, in the web interface, a **data dictionary** for every column, including the
+expected error, and two quality flags, `low_variance_flag` and `high_tie_concentration_flag`, for items where
+the model barely distinguished respondents) and, in the web interface, a **data dictionary** for every column, including the
 value labels for demographic codes (for example what `sex=1` means). Demographic labels come from a
 verified `DEMOGRAPHIC_CODEBOOK` in `generate_dataset.py` and not from
 `gss_demographics_value_labels.json`, because the GSS attaches about 12 standardized missing-value codes to

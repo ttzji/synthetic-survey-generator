@@ -15,7 +15,7 @@ What it does.
 Real alphas come from validation/reference_data/prolific_alpha_benchmark.csv (computed on the real sample's
 complete cases; the three leadership scales were answered only by the 147 respondents who supervise others).
 
-No model calls. Run from the repository root:  python validation/14_compare_alpha.py
+No model calls. Run from the repository root:  python validation/13_compare_alpha.py
 Writes validation/results/alpha_comparison.csv.
 """
 

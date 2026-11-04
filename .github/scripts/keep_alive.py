@@ -21,7 +21,8 @@ from playwright.sync_api import sync_playwright
 
 URL = os.environ.get("APP_URL", "").strip()
 EXPECT = os.environ.get("EXPECT_TEXT", "Synthetic Survey Data Generator")
-TOTAL_WAIT = int(os.environ.get("TOTAL_WAIT_SECONDS", "300"))
+TOTAL_WAIT = int(os.environ.get("TOTAL_WAIT_SECONDS", "600"))
+RELOAD_EVERY = int(os.environ.get("RELOAD_EVERY_SECONDS", "60"))   # a page that stays blank is reloaded, as a person would
 WAKE_BUTTON = re.compile(r"get this app back up", re.I)
 
 if not URL:
@@ -40,7 +41,16 @@ def main():
 
         clicked = False
         deadline = time.time() + TOTAL_WAIT
+        next_reload = time.time() + RELOAD_EVERY
         while time.time() < deadline:
+            if time.time() > next_reload:
+                # The page sometimes stays blank until it is refreshed (as a person would do).
+                print("Page still not rendered: reloading.")
+                try:
+                    page.reload(wait_until="domcontentloaded", timeout=90_000)
+                except Exception:
+                    pass
+                next_reload = time.time() + RELOAD_EVERY
             # Streamlit Cloud shows the app inside an iframe, so check every frame on the page.
             for frame in page.frames:
                 try:

@@ -15,12 +15,18 @@ either here.
 import importlib.util
 import streamlit as st
 
-# --- Load the existing, validated pipeline ---
-spec = importlib.util.spec_from_file_location("gen", "generate_dataset.py")
-gen = importlib.util.module_from_spec(spec)
-spec.loader.exec_module(gen)
-
 st.set_page_config(page_title="Synthetic Survey Data Generator", layout="wide")
+
+
+# --- Load the existing, validated pipeline ---
+# Loaded only after the access code is accepted, and once per server process (cached), so the
+# access-code page appears immediately and later page loads do not re-run the module.
+@st.cache_resource(show_spinner="Loading the generator...")
+def load_pipeline():
+    spec = importlib.util.spec_from_file_location("gen", "generate_dataset.py")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
 
 # --- Access code gate ---
 # Share the app link + this code together (e.g. in your paper or with
@@ -44,6 +50,8 @@ if not st.session_state["authenticated"]:
         else:
             st.error("Incorrect access code.")
     st.stop()
+
+gen = load_pipeline()
 
 st.title("Synthetic Survey Data Generator")
 st.caption(
